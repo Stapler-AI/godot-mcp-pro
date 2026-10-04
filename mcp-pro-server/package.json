@@ -1,0 +1,34 @@
+{
+  "name": "godot-mcp-server",
+  "version": "0.1.0",
+  "description": "Local MCP server that bridges Claude Code to the Godot MCP Pro addon over WebSocket",
+  "author": "Obediah Klopfenstein <obe711@gmail.com>",
+  "repository": "https://github.com/obe711/godot-mcp-pro",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "godot-mcp": "build/index.js",
+    "godot-mcp-cli": "build/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "cli": "tsx src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.1.0",
+    "ws": "^8.22.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

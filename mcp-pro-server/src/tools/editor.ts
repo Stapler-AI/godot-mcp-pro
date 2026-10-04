@@ -1,0 +1,47 @@
+import { z } from 'zod';
+import { tool, nodePath, pngField } from './types.js';
+
+const g = 'editor';
+const xyz = z.object({ x: z.number(), y: z.number(), z: z.number() });
+
+export const editorTools = [
+  tool({ group: g, name: 'get_editor_errors', readOnly: true,
+    description: 'Recent errors from the editor Output panel, script editor and the game log.',
+    input: { max_lines: z.number().int().optional() } }),
+  tool({ group: g, name: 'get_output_log', readOnly: true,
+    description: 'Lines from the editor Output panel, optionally filtered by substring.',
+    input: { max_lines: z.number().int().optional(), filter: z.string().optional() } }),
+  tool({ group: g, name: 'get_editor_screenshot', readOnly: true, images: pngField('image_base64'),
+    description: 'Screenshot of the whole Godot editor window (returned as an image). Give save_path (res:// or user://) to write a PNG instead.',
+    input: { save_path: z.string().optional() } }),
+  tool({ group: g, name: 'get_game_screenshot', readOnly: true, images: pngField('image_base64'), timeoutMs: 15_000,
+    description: 'Screenshot of the running game viewport (returned as an image). Requires play_scene. Give save_path to write a PNG instead.',
+    input: { save_path: z.string().optional() } }),
+  tool({ group: g, name: 'execute_editor_script',
+    description: 'Run GDScript inside the editor. The code becomes the body of `func run()` on an EditorScript-like object; use `_mcp_print(x)` to capture output; `return` a value to get it back. Set allow_unsafe_editor_io to permit file writes.',
+    input: { code: z.string(), allow_unsafe_editor_io: z.boolean().optional() }, timeoutMs: 60_000 }),
+  tool({ group: g, name: 'clear_output',
+    description: 'Clear the editor Output panel.',
+    input: {} }),
+  tool({ group: g, name: 'reload_plugin',
+    description: 'Reload the MCP addon itself. The connection drops and comes back a few seconds later.',
+    input: {} }),
+  tool({ group: g, name: 'reload_project',
+    description: 'Rescan the project filesystem (after external file changes).',
+    input: {} }),
+  tool({ group: g, name: 'get_signals', readOnly: true,
+    description: 'List the signals a node exposes and their current connections.',
+    input: { node_path: nodePath() } }),
+  tool({ group: g, name: 'compare_screenshots', readOnly: true, images: pngField('diff_image_base64'), timeoutMs: 60_000,
+    description: 'Pixel-compare two PNGs (each a res:// / user:// path or raw base64). Returns changed-pixel stats and a diff image.',
+    input: { image_a: z.string(), image_b: z.string(), threshold: z.number().int().describe('Per-channel tolerance 0-255, default 10.').optional() } }),
+  tool({ group: g, name: 'set_auto_dismiss',
+    description: 'Enable/disable automatic acceptance of blocking editor dialogs (useful during automated edits).',
+    input: { enabled: z.boolean().optional() } }),
+  tool({ group: g, name: 'get_editor_camera', readOnly: true,
+    description: 'Position, rotation and FOV of the 3D editor viewport camera.',
+    input: {} }),
+  tool({ group: g, name: 'set_editor_camera',
+    description: 'Move the 3D editor viewport camera.',
+    input: { position: xyz.optional(), rotation_degrees: xyz.optional(), look_at: xyz.optional(), fov: z.number().optional() } }),
+];
